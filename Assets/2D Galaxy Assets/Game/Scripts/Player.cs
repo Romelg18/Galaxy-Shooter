@@ -18,6 +18,8 @@ public class Player : MonoBehaviour
     private GameObject _tripleShotPrefab;
     [SerializeField]
     private GameObject _shildGameobject;
+    [SerializeField]
+    private GameObject[] _engines;
 
     [SerializeField]
     private float _fireRate = 0.25f;
@@ -30,6 +32,8 @@ public class Player : MonoBehaviour
     private UIManager _uiManager;
     private GameManager _gameManager;
     private Spawn_Manager _spawnManager;
+    private AudioSource _audioSource;
+    private int hitCount = 0;
 
     void Start()
     {
@@ -48,6 +52,8 @@ public class Player : MonoBehaviour
         {
             _spawnManager.StartSpawnRoutines();
         }
+        _audioSource=GetComponent<AudioSource>();
+        hitCount = 0;
     }
 
     // Update is called once per frame
@@ -71,6 +77,7 @@ public class Player : MonoBehaviour
 
         if (Time.time > _canFire)
         {
+            _audioSource.Play();
 
             if (canTripleShot == true)
             {
@@ -128,11 +135,24 @@ public class Player : MonoBehaviour
 
     public void Damage()
     {
+       
+
         if (shieldsActive == true)
         {
             shieldsActive = false;
             _shildGameobject.SetActive(false);
             return;
+        }
+
+        hitCount++;
+
+        if (hitCount == 1)
+        {
+            _engines[0].SetActive(true);
+        }
+        else if (hitCount == 2)
+        {
+            _engines[1].SetActive(true);
         }
 
         lives --;

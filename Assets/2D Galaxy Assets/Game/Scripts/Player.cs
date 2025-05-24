@@ -7,11 +7,17 @@ public class Player : MonoBehaviour
 
     public bool canTripleShot=false;
     public bool isSpeedBoostActive = false;
+    public bool shieldsActive = false;  
+    public int lives = 3;
 
+    [SerializeField]
+    private GameObject _explosionPrefab;
     [SerializeField]
     private GameObject _laserPrefab;
     [SerializeField]
     private GameObject _tripleShotPrefab;
+    [SerializeField]
+    private GameObject _shildGameobject;
 
     [SerializeField]
     private float _fireRate = 0.25f;
@@ -21,12 +27,27 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     private float _speed = 5.5f;
-    
-    
+    private UIManager _uiManager;
+    private GameManager _gameManager;
+    private Spawn_Manager _spawnManager;
 
     void Start()
     {
         transform.position = Vector3.zero;
+        _uiManager= GameObject.Find("Canvas").GetComponent<UIManager>();
+
+        if (_uiManager != null)
+        {
+            _uiManager.UpdateLives(lives);
+        }
+
+        _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<Spawn_Manager>();
+
+        if (_spawnManager != null )
+        {
+            _spawnManager.StartSpawnRoutines();
+        }
     }
 
     // Update is called once per frame
@@ -105,6 +126,26 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void Damage()
+    {
+        if (shieldsActive == true)
+        {
+            shieldsActive = false;
+            _shildGameobject.SetActive(false);
+            return;
+        }
+
+        lives --;
+        _uiManager.UpdateLives(lives);
+
+        if (lives < 1)
+        {
+            Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
+            _gameManager.gameOver = true;
+            _uiManager.ShowTitleScreen();
+            Destroy(this.gameObject);
+        }
+    }
     public void TripleShotPowerupOn()
     {
         canTripleShot=true;
@@ -117,7 +158,11 @@ public class Player : MonoBehaviour
         StartCoroutine(SpeedBoostDownRoutine());
     }
 
-
+    public void EnableShields()
+    {
+        shieldsActive=true;
+        _shildGameobject.SetActive(true);
+    }
    
     public IEnumerator TripleShotPowerDownRoutine() 
     {

@@ -18,6 +18,10 @@ public class Powerup : MonoBehaviour
     void Update()
     {
         transform.Translate(Vector3.down * Time.deltaTime);
+        if (transform.position.y < -7)
+        {
+            Destroy(this.gameObject);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -35,7 +39,7 @@ public class Powerup : MonoBehaviour
                     player.SpeedBoostPoweupOn();
                 }else if(powerupID == 2)
                 {
-
+                    player.EnableShields();
                 }
                
                 
